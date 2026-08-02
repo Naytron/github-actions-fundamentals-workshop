@@ -115,6 +115,15 @@ with **no tools allowed** — the model can't run shell commands or write
 files unless you explicitly pass `copilot-allow-tools`. Leave that empty
 here: inference should be inference.
 
+> **If it fails with `Copilot CLI exited with code 1`:** that's almost
+> always the token. The CLI swallows its own stderr, so check in order:
+> (1) the secret exists and is spelled exactly `COPILOT_GITHUB_TOKEN` —
+> an unset secret expands to empty and produces this precise error;
+> (2) your PAT has the **Copilot Requests: read** account permission;
+> (3) your seat's org policy allows Copilot CLI. For the real stderr,
+> re-run with debug logging enabled (repo secret `ACTIONS_STEP_DEBUG=true`
+> — Lab 1's log-diving skills apply).
+
 ## 9.3 Prompts are code — put them in files
 
 Inline prompts don't scale past one line. The `.prompt.yml` format keeps
