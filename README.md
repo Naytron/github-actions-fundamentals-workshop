@@ -5,7 +5,7 @@ Companion hands-on repository for the **GitHub Actions Fundamentals** workshop. 
 The repo carries two tracks:
 
 - **Part 1 — Actions Fundamentals (Labs 00–08):** you automate the pipeline. Deterministic workflows: events, secrets, environments, custom actions, migration, runners, and a CI/CD capstone.
-- **Part 2 — Agentic DevOps (Labs 09–12):** agents work in and around your pipeline — and the pipeline you built in Part 1 is their safety net. GitHub Models in workflows, Copilot coding agent, agentic code review + Autofix, and scheduled autonomous workflows.
+- **Part 2 — Agentic DevOps (Labs 09–12):** agents work in and around your pipeline — and the pipeline you built in Part 1 is their safety net. AI inference inside workflows, Copilot coding agent, agentic code review + Autofix, and scheduled autonomous workflows.
 
 Part 1 is built for **solo learners on `github.com`**: one attendee per repository. Features that require an organization (Actions policies, org secrets, runner groups, starter-workflow templates) are covered as **instructor demos** and marked as such in the labs.
 
@@ -35,17 +35,17 @@ Work through these in order — each lab assumes the previous one's context.
 
 | # | Lab | Theme | Time |
 |---|-----|-------|------|
-| 9 | [AI in Your Workflows](labs/09-ai-in-workflows.md) | GitHub Models + `actions/ai-inference` | ~50 min |
+| 9 | [AI in Your Workflows](labs/09-ai-in-workflows.md) | Copilot inference via `actions/ai-inference` | ~50 min |
 | 10 | [Copilot Coding Agent as a Teammate](labs/10-copilot-coding-agent.md) | Delegating issues to an agent | ~60 min |
 | 11 | [Agentic Code Review & Autofix](labs/11-agentic-code-review.md) | AI on the review side + CodeQL | ~50 min |
 | 12 | [Continuous AI (Capstone)](labs/12-continuous-ai.md) | Scheduled autonomous agents (gh-aw) | ~60 min |
 
-> **Part 2 entitlements:** Labs 10–12 assume a **Copilot Business or
-> Enterprise** seat with the coding agent enabled by org policy (agent tasks
-> consume premium requests), and work best in a repo owned by the org.
-> Lab 9 needs no Copilot seat at all — GitHub Models works with the built-in
-> `GITHUB_TOKEN`. Lab 11's CodeQL/Autofix half is free on public repos.
-> Lab 12 uses gh-aw (technical preview — expect drift).
+> **Part 2 entitlements:** all four labs need Copilot. Labs 10–12 assume a
+> **Copilot Business or Enterprise** seat with the coding agent enabled by
+> org policy (agent tasks consume premium requests), and work best in a repo
+> owned by the org. Lab 9 needs any Copilot plan plus one fine-grained PAT
+> (created in the lab). Lab 11's CodeQL/Autofix half is free on public
+> repos. Lab 12 uses gh-aw (technical preview — expect drift).
 
 Facilitators: see the **[Facilitator Runsheet](labs/facilitator-runsheet.md)** for the run-of-show, the org-demo and Part 2 pre-flight checklists, and risk mitigations.
 

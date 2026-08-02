@@ -1,14 +1,18 @@
-# Lab 9 solution — AI issue triage with GitHub Models.
+# Lab 9 solution — AI issue triage, powered by Copilot in Actions.
 # Copy to .github/workflows/issue-triage.yml
 #
-# On every new issue: ask a model (via the built-in GitHub Models inference
-# endpoint — no API key, just the `models: read` permission) which labels fit,
-# then apply them and leave a short explanatory comment.
+# On every new issue: ask a model (actions/ai-inference v3, which shells out
+# to the GitHub Copilot CLI on the runner) which labels fit, then apply them
+# and leave a short explanatory comment.
+#
+# REQUIRES ▸ repo secret COPILOT_GITHUB_TOKEN — a fine-grained PAT whose only
+# permission is the account-level "Copilot Requests: read" (see Lab 9 §9.1).
 #
 # SECURITY NOTE ▸ the issue title/body are UNTRUSTED INPUT. They go into the
 # prompt as data via templating — never into shell commands or expressions —
-# and the model's output is constrained to an enum via a JSON schema, so a
-# malicious issue can't make this workflow do anything except mislabel itself.
+# and the model's output is re-validated in code against a label allowlist,
+# so a malicious issue can't make this workflow do anything except mislabel
+# itself. The CLI runs with NO tools allowed (the action's default).
 name: AI Issue Triage
 
 on:
@@ -18,7 +22,6 @@ on:
 permissions:
   contents: read # read prompts/ from the repo
   issues: write # apply labels + comment
-  models: read # call GitHub Models inference
 
 concurrency:
   group: triage-${{ github.event.issue.number }}
@@ -27,13 +30,23 @@ concurrency:
 jobs:
   triage:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Classify issue with GitHub Models
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.x
+
+      # The Copilot CLI is not pre-installed on hosted runners.
+      - name: Install Copilot CLI
+        run: npm install -g @github/copilot
+
+      - name: Classify issue with Copilot
         id: ai
-        uses: actions/ai-inference@a7805884c80886efc241e94a5351df715968a0ad # v2.1.1
+        uses: actions/ai-inference@2c43c91ae16266ca159d311430343c67a5ffa222 # v3
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         with:
           prompt-file: ./prompts/issue-triage.prompt.yml
           # Issue text is passed as template variables — data, not instructions.
@@ -48,19 +61,34 @@ jobs:
         with:
           script: |
             const allowed = new Set(["bug", "enhancement", "question", "documentation"]);
+
+            // Nothing enforces the model's output shape — extract defensively.
+            // Models often wrap JSON in ```fences``` or add prose around it.
+            function extractJson(text) {
+              const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+              const candidate = (fenced ? fenced[1] : text).trim();
+              const start = candidate.indexOf("{");
+              const end = candidate.lastIndexOf("}");
+              if (start === -1 || end <= start) throw new Error("no JSON object in response");
+              return JSON.parse(candidate.slice(start, end + 1));
+            }
+
             let result;
             try {
-              result = JSON.parse(process.env.AI_RESPONSE);
+              result = extractJson(process.env.AI_RESPONSE ?? "");
             } catch (error) {
-              core.warning(`Model returned non-JSON output; skipping triage. ${error}`);
+              core.warning(`Model returned unusable output; skipping triage. ${error}`);
               return;
             }
             // Trust nothing: re-validate the model output before acting on it.
-            const labels = (result.labels ?? []).filter((l) => allowed.has(l));
+            const labels = (Array.isArray(result.labels) ? result.labels : [])
+              .filter((l) => allowed.has(l))
+              .slice(0, 2);
             if (labels.length === 0) {
               core.notice("Model suggested no valid labels; leaving issue untouched.");
               return;
             }
+            const reason = String(result.reason ?? "(no rationale returned)").slice(0, 500);
             await github.rest.issues.addLabels({
               ...context.repo,
               issue_number: context.issue.number,
@@ -72,8 +100,8 @@ jobs:
               body: [
                 `🤖 Auto-triage suggested label(s): ${labels.map((l) => `\`${l}\``).join(", ")}`,
                 "",
-                `> ${result.reason ?? "(no rationale returned)"}`,
+                `> ${reason}`,
                 "",
-                "_Suggested by GitHub Models in Actions — a human should confirm._",
+                "_Suggested by Copilot in Actions — a human should confirm._",
               ].join("\n"),
             });

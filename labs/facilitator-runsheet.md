@@ -40,7 +40,7 @@ Delivery guide for both tracks. Attendee-facing content lives in `labs/00`–`12
 | --- | --- | --- | --- |
 | 08:45 | Doors + entitlement triage (who can't see Copilot? fix now, not at 10:00) | — | — |
 | 09:00 | Framing: Part 1 = you automate the pipeline; Part 2 = agents inside it, pipeline as safety net | — | 15 min, no slides needed — draw the arc |
-| 09:15 | GitHub Models: `models: read`, ai-inference, prompt files, injection warning | Lab 09 | ✅ demo A |
+| 09:15 | AI inference in workflows: Copilot token, ai-inference v3, prompt files, injection warning | Lab 09 | ✅ demo A |
 | 10:15 | ☕ Break | | |
 | 10:30 | Coding agent: instruction files, setup-steps, issue quality | Lab 10 | ✅ demo B |
 | 11:45 | Regroup: PR show-and-tell — 2–3 attendees walk their agent PR + review iteration | — | The best discussion slot of the day |
@@ -87,10 +87,10 @@ Part 2 lives or dies on org entitlements. Work this list with the customer's Git
 - [ ] Fresh template copy with Part 1 CI (`solutions/02-ci.yml`) already installed and green — Labs 10/12 need CI present.
 - [ ] `bash scripts/seed-issues.sh` run once; one issue **pre-assigned to Copilot ~30 min before doors** so a finished agent PR exists to show even if live assignment queues.
 - [ ] Copilot code review requested once on that PR (demo C fallback).
-- [ ] Fine-grained PAT (Copilot Requests: read, no repo access) created and saved as `COPILOT_GITHUB_TOKEN` secret.
+- [ ] Fine-grained PAT (Copilot Requests: read, no repo access) created and saved as `COPILOT_GITHUB_TOKEN` secret — **needed from Lab 9 onward** (attendees each create their own during Lab 9 §9.1; budget 10 minutes of room time for it).
 - [ ] `gh extension install github/gh-aw` done; both Lab 12 workflows compiled, committed, and **run at least once** (gardener via dispatch).
 - [ ] **Preview-drift check (gh-aw is a technical preview):** re-run `gh aw compile` against the latest extension version the week of delivery. If frontmatter syntax changed, fix `solutions/12-*.md`, note it in the drift log below, and tell attendees to trust `gh aw --help` over stale prose.
-- [ ] Models sanity check: run your Lab 09 issue-triage workflow once (rate limits are per-repo and generous, but confirm the org hasn't disabled Models: Org → Settings → Models).
+- [ ] Inference sanity check: run your Lab 09 issue-triage workflow once end-to-end (open a throwaway issue, confirm label + comment). This exercises the PAT, the Copilot CLI install, and `actions/ai-inference` v3 in one shot. **History says take this seriously:** this lab originally used GitHub Models, which was retired mid-2026 with brownouts first — the workshop found out via a 410 in a live run. Frontier services move; test the week of delivery, not the quarter before.
 
 ### Manual test checklist (Labs 10–12)
 
@@ -145,7 +145,7 @@ YYYY-MM-DD · gh-aw vX.Y.Z · all 10 pass · notes...
 | Capstone overruns | It's designed as "start in class, finish at home"; rubric makes completion self-assessable |
 | **P2:** attendee seats missing coding agent | Entitlement triage block at doors; pair unentitled attendees with neighbors; your demo copy is the universal fallback |
 | **P2:** agent tasks queue slowly at scale (whole room assigns at once) | Stagger: half the room assigns issue 1, half issue 2; interleaved schedule absorbs the wait |
-| **P2:** premium request budget exhausted mid-day | 75% alert + a reserve budget the org admin can raise on the spot; Lab 09 (Models) is unaffected, keep teaching |
+| **P2:** premium request budget exhausted mid-day | 75% alert + a reserve budget the org admin can raise on the spot; every Part 2 lab consumes premium requests, so front-load the budget check |
 | **P2:** gh-aw preview drift breaks Lab 12 | Pre-flight compile check + drift log; worst case demo from your pre-flight artifacts and hand out the upstream [gh-aw workshop](https://github.com/githubnext/gh-aw-workshop) as take-home |
 | **P2:** no GHAS on private org repos | Lab 11 written with a demo-only fallback (11.3–11.4); or make workshop copies public for the day |
 | **P2:** Copilot code review declines/misses the planted flaw | That *is* the lesson (probabilistic reviewer) — narrate it, then let CodeQL (deterministic) catch it |
@@ -153,7 +153,7 @@ YYYY-MM-DD · gh-aw vX.Y.Z · all 10 pass · notes...
 ## Maintenance (repo owners)
 
 - Node versions: labs use 22.x/24.x; bump when LTS windows shift, update `app/package.json` engines + Dockerfile base + matrix references everywhere (grep for `22.x`).
-- Action pins: refresh SHAs quarterly (see risk table). Part 2 adds: `actions/ai-inference` (pinned to the v2 line **deliberately** — v3 switched to a Copilot-CLI backend requiring a PAT; Lab 09 §9.1 teaches this pivot, so re-read that section before bumping) and `github/codeql-action`.
+- Action pins: refresh SHAs quarterly (see risk table). Part 2 adds: `actions/ai-inference` (v3 line — the Copilot CLI backend; its v2/GitHub Models backend was retired with the service in mid-2026, which Lab 09 §9.0 now teaches as a case study) and `github/codeql-action`.
 - **Part 2 drift watch (monthly, not quarterly):** coding agent settings/UI, `copilot-setup-steps.yml` schema, Copilot code review behavior, and above all **gh-aw frontmatter** — recompile `solutions/12-*.md` against the latest extension and update Lab 12 prose where it disagrees.
 - Re-run the full capstone + the 10-item manual test checklist on a fresh template copy after any change.
 

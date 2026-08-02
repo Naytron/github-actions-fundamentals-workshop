@@ -75,22 +75,22 @@ enforces the allowlist. The model never holds a write token. Compare
 `permissions:` here with Lab 3: same principle, applied to a probabilistic
 actor.
 
-## 12.2 One-time setup: the Copilot token
+## 12.2 The Copilot token (created in Lab 9 — verify it)
 
-The Copilot engine inside the workflow authenticates with a repo secret:
+The Copilot engine inside the workflow authenticates with the same repo
+secret you created in Lab 9 §9.1: `COPILOT_GITHUB_TOKEN`, a fine-grained PAT
+with **no repo access** and only **Copilot Requests: read**. Confirm it's
+still there:
 
-1. Create a **fine-grained PAT** (Settings → Developer settings) with
-   **no repo access** and one account permission: **Copilot Requests: read**.
-2. Save it as a repo secret named `COPILOT_GITHUB_TOKEN`
-   (Settings → Secrets and variables → Actions) — or:
+```bash
+gh secret list | grep COPILOT_GITHUB_TOKEN
+```
 
-   ```bash
-   gh secret set COPILOT_GITHUB_TOKEN
-   ```
+(If you skipped Lab 9: create it now — Lab 9 §9.1 has the two steps.)
 
-Lab 3 callback: narrowest possible credential — this PAT can spend Copilot
-requests and do *nothing else*. Even if the agent were fully hijacked, the
-stolen token can't touch code.
+Lab 3 callback, restated for unattended agents: narrowest possible
+credential — this PAT can spend Copilot requests and do *nothing else*. Even
+if the agent were fully hijacked, the stolen token can't touch code.
 
 ## 12.3 Deploy the gardener
 
