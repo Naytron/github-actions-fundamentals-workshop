@@ -13,6 +13,16 @@ Completed, working workflow files for each lab. They live **outside** `.github/w
 | `06-migrated-ci.yml` | 6 | `.github/workflows/migrated-ci.yml` |
 | `07-self-hosted.yml` | 7 | `.github/workflows/self-hosted.yml` **in your private runner-playground repo** |
 | `08-capstone-pipeline.yml` | 8 | `.github/workflows/pipeline.yml` |
+| `09-issue-triage.yml` | 9 | `.github/workflows/issue-triage.yml` (uses `prompts/issue-triage.prompt.yml`) |
+| `09-ci-failure-summary.yml` | 9 | `.github/workflows/ci-failure-summary.yml` (uses `prompts/failure-summary.prompt.yml`) |
+| `11-codeql.yml` | 11 | `.github/workflows/codeql.yml` |
+| `12-repo-gardener.md` | 12 | `.github/workflows/repo-gardener.md`, then `gh aw compile` (commit the `.lock.yml` too) |
+| `12-self-healing-ci.md` | 12 | `.github/workflows/self-healing-ci.md`, then `gh aw compile` (commit the `.lock.yml` too) |
+
+> The two `12-*.md` files are **GitHub Agentic Workflow sources** (gh-aw,
+> technical preview), not plain Actions YAML — they compile to a locked
+> `.lock.yml` that is what actually runs. See
+> [Lab 12](../labs/12-continuous-ai.md).
 
 Conventions used throughout (and worth stealing for real projects):
 
